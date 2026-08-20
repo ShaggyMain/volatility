@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/llm_features.schema.json",
+  "title": "LLM Features",
+  "type": "object",
+  "required": [
+    "catalyst",
+    "sentiment",
+    "market_context",
+    "risks"
+  ],
+  "properties": {
+    "catalyst": {
+      "type": "object",
+      "required": [
+        "score",
+        "type",
+        "why_now",
+        "priced_in_score"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "type": {
+          "type": "string"
+        },
+        "why_now": {
+          "type": "string"
+        },
+        "priced_in_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "timing": {
+          "type": "string"
+        },
+        "novelty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "surprise": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "sentiment": {
+      "type": "object",
+      "required": [
+        "score",
+        "momentum"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "momentum": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "market_context": {
+      "type": "object",
+      "description": "Sector and regime context. sector_score and regime_score are signed -100..100.",
+      "properties": {
+        "sector_score": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "regime_score": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "sector": {
+          "type": "string"
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "direction": {
+      "type": "object",
+      "description": "Directional evidence. Every field is signed -100..100 except squeeze (0..100). Omit any field you cannot support with a dated source rather than guessing a neutral value.",
+      "properties": {
+        "catalyst_direction": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "analyst_revisions": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "valuation_expectations": {
+          "type": "number",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "squeeze": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "news": {
+      "type": "object",
+      "description": "News flow characteristics.",
+      "properties": {
+        "velocity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "freshest_published_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    },
+    "earnings": {
+      "type": "object",
+      "properties": {
+        "report_date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "BMO",
+            "AMC",
+            "UNKNOWN",
+            null
+          ]
+        },
+        "consensus_eps": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "prior_surprise_pattern": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "implied_move": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "description": "Analyst feature contract. v0.2 adds optional direction, news and earnings sections; required fields are unchanged, so v0.1 objects remain valid."
+}

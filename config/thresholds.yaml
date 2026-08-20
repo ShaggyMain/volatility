@@ -1,0 +1,20 @@
+version: "0.2"
+
+# Universe sizing guardrails (see config/universe.yaml for the scan itself).
+minimum_candidates: 30
+maximum_candidates: 100
+
+# A candidate below this liquidity score is not tradable enough to predict on.
+minimum_liquidity_score: 40
+
+# Probabilities must sum to 1 within this tolerance.
+prediction_probability_tolerance: 0.001
+
+# Learning gates, from docs/calibration.md.
+minimum_calibration_sample: 100
+minimum_recalibration_sample: 250
+
+# IV Rank is reported only once the system owns this many of its own IV
+# observations for a ticker. Below it, iv_rank stays null and its weight
+# redistributes -- roughly three months of daily runs.
+minimum_iv_history_observations: 60

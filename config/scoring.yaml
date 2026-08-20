@@ -1,0 +1,47 @@
+version: "0.1"
+
+volatility_score:
+  iv_rank_percentile: 0.15
+  iv_vs_rv20: 0.10
+  iv_vs_rv252: 0.05
+  iv_change: 0.10
+  volatility_acceleration: 0.15
+  options_activity: 0.10
+  relative_options_volume: 0.05
+  historical_volatility: 0.05
+  expected_move: 0.05
+  news_velocity: 0.05
+  catalyst_quality: 0.10
+
+direction_score:
+  catalyst_direction: 0.15
+  sentiment: 0.10
+  sentiment_momentum: 0.10
+  analyst_revisions: 0.10
+  relative_strength: 0.10
+  options_positioning: 0.10
+  sector: 0.10
+  market_regime: 0.05
+  valuation_expectations: 0.10
+  price_action: 0.05
+  squeeze: 0.05
+
+opportunity_score:
+  catalyst_quality: 0.20
+  direction_confidence: 0.20
+  volatility: 0.15
+  volatility_acceleration: 0.10
+  sentiment: 0.10
+  options_positioning: 0.10
+  expected_value: 0.10
+  liquidity: 0.05
+
+thresholds:
+  high_volatility: 80
+  high_conviction_opportunity: 80
+  high_conviction_probability: 0.70
+  high_conviction_confidence: 0.75
+  minimum_catalyst_score: 70
+  minimum_risk_reward: 1.5
+  high_uncertainty: 80
+  watch_direction_confidence: 0.60

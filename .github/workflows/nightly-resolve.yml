@@ -1,0 +1,45 @@
+name: nightly-resolve
+
+# Resolves predictions whose horizon has expired and refreshes the metrics
+# report. Append-only by construction: it writes outcome artifacts and reports,
+# and never touches a prediction file.
+#
+# 21:30 UTC on weekdays, shortly after the US close.
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+
+      - name: Resolve expired horizons
+        run: vol resolve --verbose
+
+      - name: Recompute metrics
+        run: vol metrics
+
+      - name: Refresh lessons view
+        run: vol lessons render
+
+      - name: Commit outcomes
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing matured today."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add predictions/resolved results LESSONS.md data
+          git commit -m "resolve: nightly outcome resolution and metrics refresh"
+          git push

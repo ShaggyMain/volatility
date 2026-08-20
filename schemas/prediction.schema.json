@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/prediction.schema.json",
+  "title": "Prediction",
+  "type": "object",
+  "required": [
+    "prediction_id",
+    "ticker",
+    "timestamp",
+    "data_cutoff",
+    "horizon",
+    "versions",
+    "scores",
+    "probabilities",
+    "expected_move",
+    "decision",
+    "thesis",
+    "invalidation_conditions"
+  ],
+  "properties": {
+    "prediction_id": {
+      "type": "string",
+      "minLength": 10
+    },
+    "ticker": {
+      "type": "string",
+      "pattern": "^[A-Z.\\-]{1,12}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "horizon": {
+      "enum": [
+        "1d",
+        "3d",
+        "5d",
+        "event"
+      ]
+    },
+    "event_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "versions": {
+      "type": "object",
+      "required": [
+        "framework",
+        "prompt",
+        "scoring",
+        "calibration"
+      ],
+      "properties": {
+        "framework": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "scoring": {
+          "type": "string"
+        },
+        "calibration": {
+          "type": "string"
+        },
+        "normalization": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "required": [
+        "volatility",
+        "volatility_acceleration",
+        "catalyst",
+        "bull",
+        "bear",
+        "opportunity",
+        "confidence",
+        "uncertainty"
+      ],
+      "properties": {
+        "volatility": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "volatility_acceleration": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "catalyst": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "bull": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "bear": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "opportunity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "uncertainty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "probabilities": {
+      "type": "object",
+      "required": [
+        "up",
+        "flat",
+        "down"
+      ],
+      "properties": {
+        "up": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "flat": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "down": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "expected_move": {
+      "type": "object",
+      "required": [
+        "up",
+        "down",
+        "market_implied"
+      ],
+      "properties": {
+        "up": {
+          "type": "number"
+        },
+        "down": {
+          "type": "number"
+        },
+        "market_implied": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "setup_type": {
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "HIGH_CONVICTION_LONG",
+        "LONG",
+        "LONG_BIAS_WATCH",
+        "HIGH_VOLATILITY_NO_DIRECTION",
+        "NO_TRADE",
+        "SHORT_BIAS_WATCH",
+        "SHORT",
+        "HIGH_CONVICTION_SHORT"
+      ]
+    },
+    "expected_value": {
+      "type": "number"
+    },
+    "risk_reward": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "thesis": {
+      "type": "string",
+      "minLength": 20
+    },
+    "key_catalyst": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "what_is_priced_in": {
+      "type": "string"
+    },
+    "invalidation_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "features": {
+      "type": "object"
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "data_quality": {
+      "type": "string",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "run_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Run that produced this prediction."
+    },
+    "thesis_source": {
+      "enum": [
+        "analyst",
+        "deterministic"
+      ],
+      "description": "Whether the thesis came from an analyst pass or was composed from computed values only."
+    },
+    "llm_features": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Validated analyst feature object used as scoring input."
+    },
+    "scoring_inputs": {
+      "type": "object",
+      "description": "Normalized 0-100 inputs per score, for audit and calibration."
+    },
+    "diagnostics": {
+      "type": "object",
+      "description": "Weight coverage, edge, tilt, expected-move source, quality flags."
+    },
+    "resolution_due": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Earliest moment the horizon can be resolved."
+    },
+    "resolved_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Set only by the resolver, in the outcome artifact; stays null in the prediction file."
+    }
+  },
+  "description": "Prediction contract. v0.2 adds optional fields (run_id, thesis_source, llm_features, scoring_inputs, diagnostics, resolution_due, resolved_at, versions.normalization). All additions are optional, so every v0.1 record remains valid."
+}
