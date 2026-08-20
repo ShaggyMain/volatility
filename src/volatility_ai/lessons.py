@@ -12,9 +12,10 @@ Weight changes go through docs/calibration.md.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from .ids import iso, utc_now
 
@@ -148,7 +149,8 @@ def render_markdown(lessons: list[Lesson]) -> str:
             "",
         ]
         if lesson.evidence:
-            lines += ["**Dowód:**", "", "```json", json.dumps(lesson.evidence, indent=2, ensure_ascii=False), "```", ""]
+            evidence = json.dumps(lesson.evidence, indent=2, ensure_ascii=False)
+            lines += ["**Dowód:**", "", "```json", evidence, "```", ""]
         if lesson.action:
             lines += [f"**Co z tym robić:** {lesson.action}", ""]
         if lesson.prediction_ids:

@@ -9,11 +9,12 @@ instead of several gigabytes, without narrowing the search to a fixed watchlist.
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from .providers.cboe import ProviderError, Quote, fetch_quote
 from .scoring import interpolate
@@ -89,7 +90,10 @@ def _percentile_ranks(values: Mapping[str, float]) -> dict[str, float]:
         return {}
     ordered = sorted(values.items(), key=lambda item: item[1])
     total = len(ordered)
-    return {symbol: (index / (total - 1) * 100.0 if total > 1 else 100.0) for index, (symbol, _) in enumerate(ordered)}
+    return {
+        symbol: (index / (total - 1) * 100.0 if total > 1 else 100.0)
+        for index, (symbol, _) in enumerate(ordered)
+    }
 
 
 def build_pool(
@@ -100,7 +104,7 @@ def build_pool(
     as_of: date | None = None,
 ) -> list[Candidate]:
     """Assemble the candidate pool from the earnings leg and the movers leg."""
-    as_of = as_of or datetime.utcnow().date()
+    as_of = as_of or datetime.now(UTC).date()
     movers_config = config.get("movers") or {}
     excluded = {str(root).upper() for root in movers_config.get("exclude_roots") or []}
     minimum_volume = float((config.get("filters") or {}).get("minimum_session_option_volume", 0))
@@ -125,7 +129,7 @@ def build_pool(
     for ticker, entry in (earnings or {}).items():
         raw_date = str(entry.get("date") or "")
         try:
-            event_day = datetime.strptime(raw_date, "%Y-%m-%d").date()
+            event_day = date.fromisoformat(raw_date)
         except ValueError:
             continue
         if not (0 <= (event_day - as_of).days <= window):

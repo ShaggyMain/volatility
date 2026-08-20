@@ -47,7 +47,13 @@ def workspace(tmp_path, monkeypatch, engine, chain, bars):
             "normalization": "0.2",
             "universe": "0.2",
         },
-        "universe": {"mode": "dynamic", "pool_size": 140, "prescreened": 24, "deep_scanned": 1, "earnings_entries": 1},
+        "universe": {
+            "mode": "dynamic",
+            "pool_size": 140,
+            "prescreened": 24,
+            "deep_scanned": 1,
+            "earnings_entries": 1,
+        },
         "predictions": [],
     }
     directory = tmp_path / "runs" / "2026" / "08-20" / identifier
@@ -89,7 +95,12 @@ def _analyst_file(directory: Path, **overrides) -> Path:
                 "what_is_priced_in": "Rynek wycenia duży ruch, ale nie jego kierunek.",
                 "invalidation_conditions": ["Publikacja zostaje przesunięta."],
                 "llm_features": {
-                    "catalyst": {"score": 82, "type": "EARNINGS", "why_now": "raport za 2 dni", "priced_in_score": 45},
+                    "catalyst": {
+                        "score": 82,
+                        "type": "EARNINGS",
+                        "why_now": "raport za 2 dni",
+                        "priced_in_score": 45,
+                    },
                     "sentiment": {"score": 30, "momentum": 60},
                     "direction": {"catalyst_direction": 40},
                     "market_context": {"sector_score": 20, "regime_score": 10},
@@ -98,8 +109,13 @@ def _analyst_file(directory: Path, **overrides) -> Path:
                     "contradictions": [],
                 },
                 "source_refs": [
-                    {"source_name": "Example", "source_type": "news", "url": "https://example.test",
-                     "published_at": "2026-08-19T12:00:00Z", "retrieved_at": "2026-08-20T09:00:00Z"}
+                    {
+                        "source_name": "Example",
+                        "source_type": "news",
+                        "url": "https://example.test",
+                        "published_at": "2026-08-19T12:00:00Z",
+                        "retrieved_at": "2026-08-20T09:00:00Z",
+                    }
                 ],
             }
         ],
@@ -171,7 +187,7 @@ def test_analyst_features_that_break_the_schema_are_skipped(workspace):
 
 
 def test_unknown_ticker_is_skipped_with_a_reason(workspace):
-    root, identifier, directory = workspace
+    _root, identifier, directory = workspace
     analyst = _analyst_file(
         directory,
         predictions=[{"ticker": "NOTINSCAN", "horizon": "3d", "thesis": "A" * 40}],

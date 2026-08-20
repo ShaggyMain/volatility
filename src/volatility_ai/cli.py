@@ -18,9 +18,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
@@ -516,7 +517,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     scan = subparsers.add_parser("scan", help="Etap ilościowy: uniwersum, pre-screen, pełny skan")
-    scan.add_argument("--run-type", default="daily", choices=["daily", "intraday", "event", "manual", "backfill"])
+    scan.add_argument(
+        "--run-type",
+        default="daily",
+        choices=["daily", "intraday", "event", "manual", "backfill"],
+    )
     scan.add_argument("--universe-config", default="config/universe.yaml")
     scan.add_argument("--earnings", default="data/earnings_calendar.json")
     scan.add_argument("--horizon", default="3d", choices=["1d", "3d", "5d", "event"])

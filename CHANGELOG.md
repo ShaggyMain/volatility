@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.2.1 — przypięty kontrakt lintu
+
+### Naprawione
+
+- **Zestaw reguł lintu jest teraz zdefiniowany w repo**, a nie dziedziczony z domyślnych
+  ustawień zainstalowanej wersji narzędzia. Poprzednio `pyproject.toml` dopuszczał
+  `ruff>=0.6,<1` bez sekcji `[tool.ruff.lint] select`, więc ten sam commit przechodził
+  lint lokalnie (ruff 0.15.8) i przewracał CI (ruff 0.16.3) — 41 znalezisk, których
+  lokalnie w ogóle nie było. Zakres wersji zawężony do `>=0.16,<0.17`, reguły wypisane
+  jawnie: `E, W, F, I, UP, B, C4, DTZ, ISC, RUF`.
+
+### Zmiany w kodzie wynikające z włączonych reguł
+
+- **Daty kalendarzowe parsowane jako daty, nie jako naiwne znaczniki czasu** (DTZ007).
+  Wygasanie opcji i świece dzienne to daty bez godziny i strefy: symbole OCC składane są
+  teraz bezpośrednio przez `date(...)`, a daty ISO przez `date.fromisoformat`.
+- **`datetime.utcnow()` zastąpione przez `datetime.now(UTC)`** (DTZ003) — stara forma jest
+  wycofywana i zwraca naiwny obiekt, co w systemie trzymającym wszystko w UTC jest pułapką.
+- **Niejawne sklejanie łańcuchów w listach opakowane w nawiasy** (ISC004). W generatorach
+  raportów brakujący przecinek między dwoma sąsiednimi łańcuchami po cichu je skleja
+  zamiast dać dwa elementy — nawiasy czynią zamiar jawnym.
+- `typing.Mapping/Sequence/Iterable` → `collections.abc`, `timezone.utc` → `UTC`,
+  `zip(points, points[1:])` → `itertools.pairwise`, uporządkowane importy, skrócone linie.
+
+Bez zmian w zachowaniu silnika, kontraktach danych i wynikach scoringu.
+
 ## v0.2.0 — warstwa runów i pętla ucząca
 
 Nadbudowa nad frameworkiem v0.1. **Żadna reguła v0.1 nie została zmieniona ani osłabiona.**

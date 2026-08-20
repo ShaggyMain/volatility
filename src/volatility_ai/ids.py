@@ -8,17 +8,17 @@ never collide (AGENTS.md rule 4).
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 STAMP_FORMAT = "%Y%m%dT%H%M%SZ"
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc).replace(microsecond=0)
+    return datetime.now(UTC).replace(microsecond=0)
 
 
 def iso(moment: datetime | None = None) -> str:
-    return (moment or utc_now()).astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return (moment or utc_now()).astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 def prediction_id(ticker: str, now: datetime | None = None) -> str:
@@ -57,4 +57,4 @@ def resolution_due(horizon: str, from_moment: datetime | None = None) -> str:
     moment = from_moment or utc_now()
     horizon_days = {"1d": 1, "3d": 3, "5d": 5, "event": 5}.get(horizon, 3)
     due_day = add_trading_days(moment.date(), horizon_days)
-    return iso(datetime.combine(due_day, datetime.min.time(), tzinfo=timezone.utc) + timedelta(hours=23))
+    return iso(datetime.combine(due_day, datetime.min.time(), tzinfo=UTC) + timedelta(hours=23))

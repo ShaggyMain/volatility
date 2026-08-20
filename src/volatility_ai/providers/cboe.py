@@ -21,7 +21,7 @@ import urllib.error
 import urllib.request
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from typing import Any
 
 CDN_BASE = "https://cdn.cboe.com/api/global/delayed_quotes"
@@ -64,7 +64,7 @@ def _http_get(url: str, timeout: float = 45.0, retries: int = 3) -> bytes:
 
 
 def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def parse_option_symbol(option_symbol: str) -> tuple[str, date, str, float]:
@@ -79,7 +79,11 @@ def parse_option_symbol(option_symbol: str) -> tuple[str, date, str, float]:
     right = option_symbol[-9].upper()
     if right not in ("C", "P"):
         raise ValueError(f"Unexpected right in {option_symbol!r}")
-    expiry = datetime.strptime(option_symbol[-15:-9], "%y%m%d").date()
+    # An expiry is a calendar date, not an instant: OCC symbols carry no time and
+    # no zone. Building the date directly keeps it that way and still raises on a
+    # malformed month or day.
+    stamp = option_symbol[-15:-9]
+    expiry = date(2000 + int(stamp[0:2]), int(stamp[2:4]), int(stamp[4:6]))
     root = option_symbol[:-15]
     return root, expiry, right, strike
 
@@ -223,7 +227,7 @@ def fetch_history(symbol: str, timeout: float = 60.0) -> tuple[Bar, ...]:
     bars: list[Bar] = []
     for row in payload.get("data") or []:
         try:
-            day = datetime.strptime(str(row["date"]), "%Y-%m-%d").date()
+            day = date.fromisoformat(str(row["date"]))
         except (KeyError, ValueError):
             continue
         close = _as_float(row.get("close"))

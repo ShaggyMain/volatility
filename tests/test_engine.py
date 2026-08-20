@@ -1,10 +1,10 @@
 import math
+from datetime import date
 
 import pytest
 
 from volatility_ai.features import build_snapshot
 from volatility_ai.scoring import ScoringEngine, coverage_weighted, interpolate, weighted_score
-from datetime import date
 
 AS_OF = date(2026, 8, 20)
 
@@ -73,7 +73,12 @@ def test_probabilities_stay_conservative_under_maximum_evidence(engine, chain, b
     maximal = {
         "catalyst": {"score": 100, "type": "EARNINGS", "why_now": "x", "priced_in_score": 0},
         "sentiment": {"score": 100, "momentum": 100},
-        "direction": {"catalyst_direction": 100, "analyst_revisions": 100, "valuation_expectations": 100, "squeeze": 100},
+        "direction": {
+            "catalyst_direction": 100,
+            "analyst_revisions": 100,
+            "valuation_expectations": 100,
+            "squeeze": 100,
+        },
         "market_context": {"sector_score": 100, "regime_score": 100},
         "news": {"velocity": 100},
         "risks": [],

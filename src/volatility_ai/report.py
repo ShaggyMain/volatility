@@ -7,7 +7,8 @@ this module only formats what the deterministic layer already decided.
 
 from __future__ import annotations
 
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 DECISION_LABELS = {
     "HIGH_CONVICTION_LONG": "LONG (wysoka konwikcja)",
@@ -40,6 +41,10 @@ def _number(value: float | None, digits: int = 2) -> str:
     return "—" if value is None else f"{value:.{digits}f}"
 
 
+def _thesis_source_label(source: str | None) -> str:
+    return "analityk" if source == "analyst" else "wyliczenie deterministyczne"
+
+
 def _label(mapping: Mapping[str, str], key: str | None) -> str:
     if not key:
         return "—"
@@ -70,10 +75,16 @@ def render_prediction(record: Mapping[str, Any], index: int) -> str:
         f"| Okazja | {_number(scores.get('opportunity'), 1)} / 100 |",
         f"| Pewność analizy | {_number(scores.get('confidence'), 2)} |",
         f"| Niepewność | {_number(scores.get('uncertainty'), 2)} |",
-        f"| P(wzrost) / P(bez ruchu) / P(spadek) | {_percent(probabilities.get('up'), 1)} / "
-        f"{_percent(probabilities.get('flat'), 1)} / {_percent(probabilities.get('down'), 1)} |",
-        f"| Oczekiwany ruch w górę / w dół | {_percent(expected_move.get('up'))} / "
-        f"{_percent(expected_move.get('down'))} |",
+        (
+            f"| P(wzrost) / P(bez ruchu) / P(spadek) |"
+            f" {_percent(probabilities.get('up'), 1)} /"
+            f" {_percent(probabilities.get('flat'), 1)} /"
+            f" {_percent(probabilities.get('down'), 1)} |"
+        ),
+        (
+            f"| Oczekiwany ruch w górę / w dół |"
+            f" {_percent(expected_move.get('up'))} / {_percent(expected_move.get('down'))} |"
+        ),
         f"| Ruch wyceniany przez rynek | {_percent(expected_move.get('market_implied'))} |",
         f"| Wartość oczekiwana | {_percent(record.get('expected_value'))} |",
         f"| Stosunek zysk/ryzyko | {_number(record.get('risk_reward'))} |",
@@ -93,7 +104,7 @@ def render_prediction(record: Mapping[str, Any], index: int) -> str:
         f"| Ruch 5 sesji | {_percent(features.get('return_5d'), 1)} |",
         f"| Siła względna 20 sesji vs benchmark | {_percent(features.get('relative_strength_20d'), 1)} |",
         "",
-        f"**Teza** ({'analityk' if record.get('thesis_source') == 'analyst' else 'wyliczenie deterministyczne'})",
+        f"**Teza** ({_thesis_source_label(record.get('thesis_source'))})",
         "",
         record.get("thesis", "—"),
         "",
@@ -113,10 +124,12 @@ def render_prediction(record: Mapping[str, Any], index: int) -> str:
     lines += [
         f"**Rozliczenie:** nie wcześniej niż {record.get('resolution_due', '—')}",
         "",
-        f"<sub>Pokrycie wag: zmienność {diagnostics.get('volatility_weight_coverage', '—')}, "
-        f"kierunek {diagnostics.get('direction_weight_coverage', '—')}, "
-        f"okazja {diagnostics.get('opportunity_weight_coverage', '—')}. "
-        f"Źródło oczekiwanego ruchu: {diagnostics.get('expected_move_source', '—')}.</sub>",
+        (
+            f"<sub>Pokrycie wag: zmienność {diagnostics.get('volatility_weight_coverage', '—')},"
+            f" kierunek {diagnostics.get('direction_weight_coverage', '—')},"
+            f" okazja {diagnostics.get('opportunity_weight_coverage', '—')}."
+            f" Źródło oczekiwanego ruchu: {diagnostics.get('expected_move_source', '—')}.</sub>"
+        ),
         "",
         "---",
         "",
@@ -145,9 +158,13 @@ def render(
         f"**Data cutoff:** {manifest.get('data_cutoff')}  ",
         f"**Komenda:** {manifest.get('command') or '—'}",
         "",
-        f"**Wersje:** framework `{versions.get('framework')}`, scoring `{versions.get('scoring')}`, "
-        f"kalibracja `{versions.get('calibration')}`, normalizacja `{versions.get('normalization')}`, "
-        f"uniwersum `{versions.get('universe')}`",
+        (
+            f"**Wersje:** framework `{versions.get('framework')}`,"
+            f" scoring `{versions.get('scoring')}`,"
+            f" kalibracja `{versions.get('calibration')}`,"
+            f" normalizacja `{versions.get('normalization')}`,"
+            f" uniwersum `{versions.get('universe')}`"
+        ),
         "",
         "## Zakres skanu",
         "",
@@ -174,9 +191,12 @@ def render(
         lines += [
             "## Predykcje",
             "",
-            "Ten run nie wygenerował żadnej predykcji. To wynik, nie brak wyniku: żadna spółka "
-            "z przeskanowanego uniwersum nie przekroczyła progów z `config/scoring.yaml`, "
-            "albo zabrakło danych krytycznych i system zatrzymał się zamiast zgadywać.",
+            (
+                "Ten run nie wygenerował żadnej predykcji. To wynik, nie brak wyniku: żadna"
+                " spółka z przeskanowanego uniwersum nie przekroczyła progów z"
+                " `config/scoring.yaml`, albo zabrakło danych krytycznych i system zatrzymał"
+                " się zamiast zgadywać."
+            ),
             "",
         ]
 
@@ -191,10 +211,11 @@ def render(
         ]
         for entry in watchlist:
             lines.append(
-                f"| {entry.get('ticker')} | {_number(entry.get('volatility'), 1)} | "
-                f"{_number(entry.get('volatility_acceleration'), 1)} | {_number(entry.get('opportunity'), 1)} | "
-                f"{_percent(entry.get('iv30'), 1)} | {_number(entry.get('iv_rv20'))} | "
-                f"{_percent(entry.get('term_slope'), 2)} | {entry.get('reason', '—')} |"
+                f"| {entry.get('ticker')} | {_number(entry.get('volatility'), 1)} |"
+                f" {_number(entry.get('volatility_acceleration'), 1)} |"
+                f" {_number(entry.get('opportunity'), 1)} |"
+                f" {_percent(entry.get('iv30'), 1)} | {_number(entry.get('iv_rv20'))} |"
+                f" {_percent(entry.get('term_slope'), 2)} | {entry.get('reason', '—')} |"
             )
         lines.append("")
 
@@ -229,9 +250,11 @@ def render(
     lines += [
         "---",
         "",
-        "<sub>Run badawczy. Nie jest rekomendacją inwestycyjną ani zleceniem. "
-        "Predykcje są zapisane w `predictions/` i nie podlegają późniejszej edycji; "
-        "wyniki trafią do `predictions/resolved/` po upływie horyzontu.</sub>",
+        (
+            "<sub>Run badawczy. Nie jest rekomendacją inwestycyjną ani zleceniem."
+            " Predykcje są zapisane w `predictions/` i nie podlegają późniejszej edycji;"
+            " wyniki trafią do `predictions/resolved/` po upływie horyzontu.</sub>"
+        ),
         "",
     ]
     return "\n".join(lines)
