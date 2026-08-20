@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 HEADER = ["observed_at_utc", "iv30", "spot", "rv20", "option_volume", "source"]
@@ -84,7 +84,7 @@ class IVHistoryStore:
         path = self._path(ticker)
         path.parent.mkdir(parents=True, exist_ok=True)
         is_new = not path.exists()
-        stamp = observed_at_utc or datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace(
+        stamp = observed_at_utc or datetime.now(UTC).replace(microsecond=0).isoformat().replace(
             "+00:00", "Z"
         )
         with path.open("a", encoding="utf-8", newline="") as handle:

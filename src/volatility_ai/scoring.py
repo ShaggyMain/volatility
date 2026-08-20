@@ -9,9 +9,11 @@ same config versions, this module returns the same result forever.
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from itertools import pairwise
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import yaml
 
@@ -68,7 +70,7 @@ def interpolate(anchors: Anchors, raw: float) -> float:
         return points[0][1]
     if raw >= points[-1][0]:
         return points[-1][1]
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+    for (x0, y0), (x1, y1) in pairwise(points):
         if x0 <= raw <= x1:
             if x1 == x0:
                 return y1

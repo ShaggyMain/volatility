@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import UTC, date
 from pathlib import Path
 
 import pytest
@@ -33,9 +33,9 @@ def test_data_cutoff_comes_from_the_snapshot_not_write_time(engine, chain, bars)
 
     An analyst pass can take an hour; the cutoff must not drift with it.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    written_an_hour_later = datetime(2026, 8, 20, 10, 5, tzinfo=timezone.utc)
+    written_an_hour_later = datetime(2026, 8, 20, 10, 5, tzinfo=UTC)
     record = _record(engine, chain, bars, thesis="A" * 40, now=written_an_hour_later)
     assert record["data_cutoff"] == chain.retrieved_at == "2026-08-20T09:05:00Z"
     assert record["timestamp"] == "2026-08-20T10:05:00Z"

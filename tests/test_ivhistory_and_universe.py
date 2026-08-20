@@ -104,10 +104,14 @@ def test_prescreen_rejects_and_explains(monkeypatch):
 
     monkeypatch.setattr(universe_module, "fetch_quote", fake_quote)
     config = dict(CONFIG)
-    config["filters"] = {"minimum_price": 3.0, "allowed_security_types": ["stock"], "minimum_session_option_volume": 100}
+    config["filters"] = {
+        "minimum_price": 3.0,
+        "allowed_security_types": ["stock"],
+        "minimum_session_option_volume": 100,
+    }
     config["prescreen_weights"] = {"option_volume_rank": 0.5, "iv_change": 0.3, "absolute_price_move": 0.2}
 
-    pool = [c for c in build_pool(CONFIG, VOLUME, {}, as_of=date(2026, 8, 20))]
+    pool = build_pool(CONFIG, VOLUME, {}, as_of=date(2026, 8, 20))
     survivors = prescreen(pool, config, workers=2)
 
     assert [c.ticker for c in survivors] == ["AAA"]

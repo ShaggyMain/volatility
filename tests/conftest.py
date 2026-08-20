@@ -14,22 +14,22 @@ AS_OF = date(2026, 8, 20)
 
 
 def _contract(expiry: date, right: str, strike: float, iv: float, **overrides) -> OptionContract:
-    defaults = dict(
-        option_symbol=f"TEST{expiry:%y%m%d}{right}{int(strike * 1000):08d}",
-        expiry=expiry,
-        right=right,
-        strike=strike,
-        bid=max(0.05, abs(100 - strike) * 0.1 + 2.0),
-        ask=max(0.10, abs(100 - strike) * 0.1 + 2.4),
-        last_trade_price=2.2,
-        iv=iv,
-        open_interest=1200.0,
-        volume=400.0,
-        delta=0.5 if right == "C" else -0.5,
-        gamma=0.02,
-        vega=0.1,
-        theta=-0.05,
-    )
+    defaults = {
+        "option_symbol": f"TEST{expiry:%y%m%d}{right}{int(strike * 1000):08d}",
+        "expiry": expiry,
+        "right": right,
+        "strike": strike,
+        "bid": max(0.05, abs(100 - strike) * 0.1 + 2.0),
+        "ask": max(0.10, abs(100 - strike) * 0.1 + 2.4),
+        "last_trade_price": 2.2,
+        "iv": iv,
+        "open_interest": 1200.0,
+        "volume": 400.0,
+        "delta": 0.5 if right == "C" else -0.5,
+        "gamma": 0.02,
+        "vega": 0.1,
+        "theta": -0.05,
+    }
     defaults.update(overrides)
     return OptionContract(**defaults)
 
@@ -75,7 +75,14 @@ def bars() -> tuple[Bar, ...]:
         index += 1
         price *= 1.0 + 0.0012 + 0.02 * math.sin(index / 5.0)
         series.append(
-            Bar(day=day, open=price * 0.995, high=price * 1.015, low=price * 0.985, close=price, volume=5_000_000)
+            Bar(
+                day=day,
+                open=price * 0.995,
+                high=price * 1.015,
+                low=price * 0.985,
+                close=price,
+                volume=5_000_000,
+            )
         )
     return tuple(series)
 

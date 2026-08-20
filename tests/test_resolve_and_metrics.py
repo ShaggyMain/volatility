@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -6,7 +6,7 @@ from volatility_ai import metrics as metrics_module
 from volatility_ai import resolve as resolve_module
 from volatility_ai.providers.cboe import Bar
 
-BASE = datetime(2026, 8, 20, 13, 0, tzinfo=timezone.utc)
+BASE = datetime(2026, 8, 20, 13, 0, tzinfo=UTC)
 
 
 def _prediction(**overrides):
@@ -50,7 +50,7 @@ def test_session_in_progress_is_excluded():
     """A bar dated the day of the prediction partly precedes it, so it cannot count."""
     same_day = Bar(day=date(2026, 8, 20), open=100, high=120, low=99, close=118, volume=1e6)
     outcome, status, _ = resolve_module.compute_outcome(
-        _prediction(), [same_day] + _bars([101, 102, 103])
+        _prediction(), [same_day, *_bars([101, 102, 103])]
     )
     assert status == "resolved"
     # 103/100 - 1, not the 118 print from the prediction's own session.

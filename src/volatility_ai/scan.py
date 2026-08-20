@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import date
-from typing import Sequence
 
 from .features import FeatureSnapshot, build_snapshot
 from .ivhistory import IVHistoryStore

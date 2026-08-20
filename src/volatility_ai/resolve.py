@@ -11,10 +11,11 @@ from __future__ import annotations
 import json
 import math
 import statistics
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 from .ids import iso, utc_now
 from .providers.cboe import Bar, ProviderError, fetch_history

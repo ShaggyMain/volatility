@@ -8,9 +8,10 @@ edited -- outcomes land in separate files (AGENTS.md rules 1, 2, 7).
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -56,8 +57,11 @@ def quant_thesis(snapshot: FeatureSnapshot, result: ScoreResult) -> str:
     """
     values = snapshot.values
     parts = [
-        f"Deterministic record for {snapshot.ticker}: volatility score {result.scores.volatility:.0f}/100,"
-        f" acceleration {result.scores.volatility_acceleration:.0f}/100."
+        (
+            f"Deterministic record for {snapshot.ticker}:"
+            f" volatility score {result.scores.volatility:.0f}/100,"
+            f" acceleration {result.scores.volatility_acceleration:.0f}/100."
+        )
     ]
     if values.get("iv30") is not None:
         parts.append(f"IV30 {values['iv30'] * 100:.1f}%.")

@@ -15,7 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8,<9",
-  "ruff>=0.6,<1",
+  "ruff>=0.16,<0.17",
 ]
 
 [project.scripts]
@@ -31,3 +31,21 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 110
 target-version = "py311"
+
+# The rule set is pinned here on purpose. Left implicit, it becomes whatever the
+# installed ruff version happens to default to, so the same commit can pass lint
+# on one machine and fail on another. That is the class of irreproducibility this
+# repository exists to avoid, and it applies to the toolchain too.
+[tool.ruff.lint]
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "F",    # pyflakes
+  "I",    # import sorting
+  "UP",   # pyupgrade
+  "B",    # bugbear
+  "C4",   # comprehensions
+  "DTZ",  # timezone-aware datetimes
+  "ISC",  # implicit string concatenation
+  "RUF",  # ruff-specific
+]

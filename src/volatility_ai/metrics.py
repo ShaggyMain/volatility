@@ -12,8 +12,9 @@ from __future__ import annotations
 import math
 import statistics
 from collections import defaultdict
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 from .resolve import horizon_return
 
@@ -170,7 +171,9 @@ def directional_accuracy(pairs: Sequence[Pair]) -> dict[str, Any]:
     }
 
 
-def volatility_detection(pairs: Sequence[Pair], calibration: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def volatility_detection(
+    pairs: Sequence[Pair], calibration: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
     """Precision and recall of the high-volatility call.
 
     A "positive" is a volatility score at or above the threshold; a "true event"
@@ -240,7 +243,9 @@ def expected_move_coverage(pairs: Sequence[Pair]) -> dict[str, Any]:
     }
 
 
-def by_score_bucket(pairs: Sequence[Pair], score: str = "opportunity", width: int = 20) -> list[dict[str, Any]]:
+def by_score_bucket(
+    pairs: Sequence[Pair], score: str = "opportunity", width: int = 20
+) -> list[dict[str, Any]]:
     """Realized movement grouped by score bucket -- does a higher score pay?"""
     buckets: dict[int, list[Pair]] = defaultdict(list)
     for pair in pairs:
@@ -342,9 +347,12 @@ def render_markdown(report: Report, minimum_sample: int = 100) -> str:
 
     if report.sample_size < minimum_sample:
         lines += [
-            f"> Próba liczy {report.sample_size} obserwacji, a `config/thresholds.yaml` wymaga "
-            f"{minimum_sample} do pierwszego przeglądu kalibracyjnego i 250 do zmiany wag. "
-            "Poniższe liczby są orientacyjne i nie uzasadniają jeszcze żadnej zmiany modelu.",
+            (
+                f"> Próba liczy {report.sample_size} obserwacji, a `config/thresholds.yaml`"
+                f" wymaga {minimum_sample} do pierwszego przeglądu kalibracyjnego i 250 do"
+                " zmiany wag. Poniższe liczby są orientacyjne i nie uzasadniają jeszcze"
+                " żadnej zmiany modelu."
+            ),
             "",
         ]
 
@@ -380,17 +388,28 @@ def render_markdown(report: Report, minimum_sample: int = 100) -> str:
         "",
         "## Kierunek",
         "",
-        f"- Predykcji kierunkowych: **{direction.get('count')}** (bez ruchów płaskich: {direction.get('non_flat_count')})",
+        (
+            f"- Predykcji kierunkowych: **{direction.get('count')}**"
+            f" (bez ruchów płaskich: {direction.get('non_flat_count')})"
+        ),
         f"- Trafność kierunku: **{direction.get('accuracy')}**",
-        f"- Udział LONG: **{direction.get('long_bias')}** — wartość trwale bliska 1,0 oznacza systematyczny byczy bias",
+        (
+            f"- Udział LONG: **{direction.get('long_bias')}** — wartość trwale bliska 1,0"
+            " oznacza systematyczny byczy bias"
+        ),
         "",
         "## Wykrywanie wysokiej zmienności",
         "",
         f"- Próg wyniku zmienności: {detection.get('threshold')}",
-        f"- Precyzja: **{detection.get('precision')}** — ile sygnałów wysokiej zmienności faktycznie się zmaterializowało",
+        (
+            f"- Precyzja: **{detection.get('precision')}** — ile sygnałów wysokiej"
+            " zmienności faktycznie się zmaterializowało"
+        ),
         f"- Czułość: **{detection.get('recall')}** — ile realnych dużych ruchów system wyłapał",
-        f"- TP {detection.get('true_positive')} / FP {detection.get('false_positive')} / "
-        f"FN {detection.get('false_negative')} / TN {detection.get('true_negative')}",
+        (
+            f"- TP {detection.get('true_positive')} / FP {detection.get('false_positive')}"
+            f" / FN {detection.get('false_negative')} / TN {detection.get('true_negative')}"
+        ),
         "",
         "## Pokrycie oczekiwanego ruchu",
         "",
@@ -434,9 +453,11 @@ def render_markdown(report: Report, minimum_sample: int = 100) -> str:
         "",
         "---",
         "",
-        "<sub>Raport nie zmienia żadnych wag. Zmiana scoringu wymaga procedury z "
-        "`docs/calibration.md`: minimum 250 rozliczonych obserwacji, porównanie na zbiorze "
-        "holdout i akceptacji człowieka.</sub>",
+        (
+            "<sub>Raport nie zmienia żadnych wag. Zmiana scoringu wymaga procedury z"
+            " `docs/calibration.md`: minimum 250 rozliczonych obserwacji, porównanie na"
+            " zbiorze holdout i akceptacji człowieka.</sub>"
+        ),
         "",
     ]
     return "\n".join(lines)

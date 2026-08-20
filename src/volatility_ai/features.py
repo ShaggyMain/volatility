@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import math
 import statistics
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from .providers.cboe import Bar, Chain, OptionContract
 
@@ -144,7 +145,7 @@ class FeatureSnapshot:
         return present / len(self.values)
 
     @classmethod
-    def from_json(cls, payload: Mapping[str, Any]) -> "FeatureSnapshot":
+    def from_json(cls, payload: Mapping[str, Any]) -> FeatureSnapshot:
         """Rebuild a snapshot from its stored form.
 
         The analyst step re-scores from the stored snapshot rather than
