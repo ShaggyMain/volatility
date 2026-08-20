@@ -1,0 +1,72 @@
+# Normalization anchors, version 0.2
+#
+# Every raw feature is mapped onto a 0-100 scale by piecewise-linear
+# interpolation between the anchor points below. Anchors must be listed with
+# strictly increasing raw values. Values outside the range are clamped.
+#
+# These anchors are part of the scoring contract: changing them changes scores,
+# so bump `version` and record a migration note (AGENTS.md rule 13).
+version: "0.2"
+
+anchors:
+  # --- implied volatility -------------------------------------------------
+  # IV divided by 20-day realized volatility. Above 1.0 the market is paying up
+  # for future movement relative to what the stock has actually done.
+  iv_rv20:      [[0.60, 5], [0.85, 25], [1.00, 40], [1.30, 65], [1.80, 85], [2.50, 100]]
+  iv_rv252:     [[0.60, 5], [0.85, 25], [1.00, 40], [1.30, 65], [1.80, 85], [2.50, 100]]
+  # One-day change in 30-day IV, in decimal terms (0.05 == 5 vol points).
+  iv30_change:  [[-0.06, 0], [-0.02, 15], [0.00, 35], [0.02, 60], [0.05, 82], [0.10, 100]]
+  # Level of 20-day realized volatility, annualized.
+  rv20_level:   [[0.12, 5], [0.20, 25], [0.32, 50], [0.50, 75], [0.80, 92], [1.20, 100]]
+  # At-the-money straddle cost for the front expiry, as a fraction of spot.
+  expected_move: [[0.008, 5], [0.020, 30], [0.035, 50], [0.060, 72], [0.100, 90], [0.180, 100]]
+
+  # --- acceleration -------------------------------------------------------
+  # 5-day realized volatility over 20-day: > 1 means movement is picking up now.
+  rv_acceleration: [[0.50, 5], [0.80, 25], [1.00, 40], [1.40, 65], [2.00, 87], [3.00, 100]]
+  # Term-structure slope (back IV minus front IV). Negative slope is
+  # backwardation, the classic marker of a dated event.
+  term_slope_inverted: [[-0.20, 100], [-0.08, 85], [-0.03, 62], [0.00, 38], [0.03, 18], [0.08, 5]]
+  # Traded option volume relative to resting open interest.
+  volume_oi_ratio: [[0.03, 5], [0.10, 25], [0.25, 50], [0.50, 72], [1.00, 90], [2.00, 100]]
+  # Stock volume versus its own 20-day average.
+  stock_volume_ratio: [[0.50, 5], [0.90, 30], [1.20, 48], [1.80, 70], [3.00, 90], [5.00, 100]]
+
+  # --- direction (50 == neutral) -----------------------------------------
+  relative_strength_20d: [[-0.20, 0], [-0.08, 22], [-0.02, 42], [0.02, 58], [0.08, 78], [0.20, 100]]
+  relative_strength_5d:  [[-0.10, 0], [-0.04, 25], [-0.01, 44], [0.01, 56], [0.04, 75], [0.10, 100]]
+  return_20d:            [[-0.30, 0], [-0.10, 25], [-0.02, 44], [0.02, 56], [0.10, 75], [0.30, 100]]
+  pct_from_52w_high:     [[-0.60, 0], [-0.30, 25], [-0.10, 45], [-0.03, 62], [0.00, 78], [0.05, 100]]
+  # Put/call volume: a low ratio is call-heavy positioning, mapped bullish.
+  put_call_volume_inverted: [[0.25, 92], [0.50, 72], [0.75, 56], [1.00, 44], [1.50, 25], [2.50, 5]]
+  # 25-delta put IV minus 25-delta call IV. Rich puts read bearish.
+  skew_inverted: [[-0.05, 90], [-0.02, 70], [0.00, 55], [0.03, 42], [0.08, 22], [0.15, 5]]
+
+  # --- quality ------------------------------------------------------------
+  # Median relative bid/ask spread on the front expiry. Wide markets are a
+  # tradability problem regardless of how good the setup looks.
+  spread_liquidity: [[0.02, 100], [0.05, 82], [0.10, 62], [0.20, 38], [0.35, 15], [0.60, 0]]
+  option_volume_level: [[500, 5], [5000, 30], [25000, 55], [100000, 78], [500000, 93], [2000000, 100]]
+
+# Sub-composites: features that scoring.yaml treats as a single input but which
+# are themselves built from several raw features. Weights redistribute over
+# whatever is available, exactly like the top-level scores.
+composites:
+  volatility_acceleration:
+    rv_acceleration: 0.30
+    iv30_change: 0.25
+    term_slope_inverted: 0.20
+    volume_oi_ratio: 0.15
+    stock_volume_ratio: 0.10
+  options_positioning:
+    put_call_volume_inverted: 0.60
+    skew_inverted: 0.40
+  price_action:
+    return_20d: 0.55
+    pct_from_52w_high: 0.45
+  relative_strength:
+    relative_strength_20d: 0.65
+    relative_strength_5d: 0.35
+  liquidity:
+    spread_liquidity: 0.60
+    option_volume_level: 0.40

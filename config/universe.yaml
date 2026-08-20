@@ -1,0 +1,68 @@
+# Universe construction, version 0.2
+#
+# Mode: dynamic. Each run rebuilds its candidate pool from scratch rather than
+# scanning a fixed list, so the scan follows where movement and events actually
+# are. Two sources feed the pool:
+#
+#   1. earnings   -- tickers reporting inside `earnings_window_days`, taken from
+#                    data/earnings_calendar.json (written by the analyst step of
+#                    the run, with a source URL per entry).
+#   2. movers     -- the previous session's Cboe option-volume leaders.
+#
+# The pool is then pre-screened cheaply (quote endpoint only) before the
+# expensive full-chain scan runs on the finalists.
+version: "0.2"
+mode: dynamic
+
+earnings_window_days: 10
+
+movers:
+  # How many option-volume leaders to pull into the pool.
+  top_by_option_volume: 140
+  # Ignore roots that are not single-name equities.
+  exclude_roots:
+    - SPX
+    - SPXW
+    - VIX
+    - VIXW
+    - NDX
+    - NDXP
+    - RUT
+    - RUTW
+    - XSP
+    - OEX
+    - DJX
+    - VVIX
+    - MRUT
+    - XND
+
+filters:
+  minimum_price: 3.0
+  # Cboe reports security_type; only single-name stocks are scored.
+  allowed_security_types: ["stock", "etf"]
+  # Drop pre-screen candidates with no option volume at all.
+  minimum_session_option_volume: 250
+
+sizing:
+  # Cheap quote-level pre-screen.
+  prescreen_maximum: 180
+  # Expensive full-chain scan.
+  deep_scan: 26
+  # Reported in the run.
+  top_predictions: 5
+  watchlist: 10
+
+# Optional: tickers you always want checked regardless of the dynamic pool.
+# Leave empty to keep the universe fully dynamic.
+always_consider: []
+
+benchmark: SPY
+
+# Pre-screen weights. This ranking decides only which tickers earn an expensive
+# full-chain scan -- it is a triage step, never a prediction, and it never
+# reaches the prediction record.
+prescreen_weights:
+  option_volume_rank: 0.35
+  iv_change: 0.30
+  absolute_price_move: 0.20
+  earnings_soon: 0.15

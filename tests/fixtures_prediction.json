@@ -1,0 +1,55 @@
+{
+  "prediction_id": "20260820T090000Z-ROST-demo01",
+  "ticker": "ROST",
+  "timestamp": "2026-08-20T09:00:00Z",
+  "data_cutoff": "2026-08-20T08:55:00Z",
+  "horizon": "1d",
+  "event_id": null,
+  "versions": {
+    "framework": "volatility_catalyst_v2.0",
+    "prompt": "volatility_catalyst_v2.0",
+    "scoring": "0.1",
+    "calibration": "0.1"
+  },
+  "scores": {
+    "volatility": 89,
+    "volatility_acceleration": 76,
+    "catalyst": 88,
+    "bull": 72,
+    "bear": 28,
+    "opportunity": 81,
+    "confidence": 0.78,
+    "uncertainty": 0.22
+  },
+  "probabilities": {
+    "up": 0.64,
+    "flat": 0.13,
+    "down": 0.23
+  },
+  "expected_move": {
+    "up": 0.08,
+    "down": -0.06,
+    "market_implied": 0.07
+  },
+  "expected_value": 0.031,
+  "risk_reward": 1.33,
+  "setup_type": "EARNINGS_HIGH_VOLATILITY",
+  "decision": "LONG_BIAS_WATCH",
+  "thesis": "Strong catalyst and elevated volatility with a moderate bullish directional edge.",
+  "key_catalyst": "Upcoming earnings release",
+  "what_is_priced_in": "A large portion of positive expectations appears reflected in recent price and options pricing.",
+  "invalidation_conditions": [
+    "Guidance materially below expectations",
+    "Sector peers show broad deterioration"
+  ],
+  "features": {
+    "iv_rank": 93,
+    "iv_percentile": 91,
+    "iv_rv20": 1.8,
+    "iv_rv252": 1.7,
+    "iv_change_1d": 0.12,
+    "news_velocity": 78
+  },
+  "source_refs": [],
+  "data_quality": "MEDIUM"
+}

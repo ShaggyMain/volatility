@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/run.schema.json",
+  "title": "Run",
+  "description": "Manifest of one scan. Records what was searched, what was rejected and why, and which predictions the run produced.",
+  "type": "object",
+  "required": [
+    "run_id",
+    "run_type",
+    "started_at",
+    "finished_at",
+    "data_cutoff",
+    "versions",
+    "universe",
+    "predictions"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 10
+    },
+    "run_type": {
+      "enum": [
+        "daily",
+        "intraday",
+        "event",
+        "manual",
+        "backfill"
+      ]
+    },
+    "command": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The instruction that triggered the run, as given."
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "versions": {
+      "type": "object",
+      "required": [
+        "framework",
+        "scoring",
+        "calibration"
+      ],
+      "properties": {
+        "framework": {
+          "type": "string"
+        },
+        "scoring": {
+          "type": "string"
+        },
+        "calibration": {
+          "type": "string"
+        },
+        "normalization": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "universe": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "universe": {
+      "type": "object",
+      "required": [
+        "mode",
+        "pool_size",
+        "prescreened",
+        "deep_scanned"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "pool_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "prescreened": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deep_scanned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "earnings_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "rejected": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "predictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "prediction_id values written by this run."
+    },
+    "watchlist": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Tickers scanned but not turned into a prediction, each with a reason."
+    },
+    "data_sources": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "lessons_applied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "LESSONS.md entries the analyst pass took into account."
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

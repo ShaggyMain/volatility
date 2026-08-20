@@ -1,0 +1,63 @@
+# Calibration parameters, version 0.1 (the bootstrap set).
+#
+# These are the knobs the learning loop is allowed to tune, and the only ones.
+# They are NOT fitted to anything yet: v0.1 ships deliberately conservative
+# priors chosen so that early predictions are under-confident rather than
+# over-confident. A change here requires the procedure in docs/calibration.md
+# (minimum 250 resolved observations, holdout comparison, human merge).
+version: "0.1"
+fitted_on: null
+sample_size: 0
+notes: "Bootstrap priors. Not fitted to resolved outcomes. Expect the first calibration review at 100 resolved predictions."
+
+probabilities:
+  # Baseline weight on the "no meaningful move" outcome, before volatility.
+  flat_base: 0.34
+  # High-volatility names get less probability mass on "flat".
+  flat_min: 0.10
+  flat_max: 0.45
+  # How hard the directional edge is allowed to tilt the distribution.
+  # Deliberately low: a 100/0 bull/bear split with full confidence lands near
+  # 0.66 up, not 0.95. Overconfidence is the failure mode this guards against.
+  direction_gain: 1.10
+
+expected_move:
+  # Our expected move starts from the market-implied move and is scaled by our
+  # own volatility view. A volatility score of 50 leaves it unchanged.
+  volatility_scale_min: 0.85
+  volatility_scale_max: 1.25
+  # Extra stretch applied to the side the directional tilt favours.
+  directional_stretch: 0.35
+  # Fallback when no straddle is quotable: iv30 scaled to the horizon.
+  horizon_trading_days:
+    "1d": 1
+    "3d": 3
+    "5d": 5
+    "event": 3
+
+confidence:
+  # Confidence measures how much the analysis can be relied on (AGENTS.md),
+  # not how likely the direction is.
+  weights:
+    feature_coverage: 0.35
+    liquidity: 0.25
+    data_freshness: 0.20
+    signal_agreement: 0.20
+  # Each quality flag on the snapshot costs this much confidence.
+  quality_flag_penalty: 0.06
+  floor: 0.10
+  ceiling: 0.90
+
+outcome:
+  # What counts as "flat" when scoring a probability forecast. A realized move
+  # smaller than this fraction of the market-implied move is treated as flat,
+  # so the definition scales with each name's own volatility instead of using
+  # one percentage for a utility and a biotech alike.
+  flat_band_vs_implied: 0.5
+  # Fallback band when no market-implied move was recorded.
+  flat_band_absolute: 0.01
+  # A prediction claims "high volatility" at or above this volatility score.
+  high_volatility_score: 80
+  # Realized move counts as a genuine high-volatility event at or above this
+  # multiple of the market-implied move.
+  high_volatility_realized_multiple: 1.0
