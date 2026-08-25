@@ -1,6 +1,6 @@
 # Metryki predykcji
 
-**Wygenerowano:** 2026-08-24T21:54:21Z  
+**Wygenerowano:** 2026-08-25T21:54:19Z  
 **Rozliczonych predykcji:** 0
 
 > Próba liczy 0 obserwacji, a `config/thresholds.yaml` wymaga 100 do pierwszego przeglądu kalibracyjnego i 250 do zmiany wag. Poniższe liczby są orientacyjne i nie uzasadniają jeszcze żadnej zmiany modelu.
