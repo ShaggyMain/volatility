@@ -1,0 +1,38 @@
+{
+  "sample_size": 0,
+  "generated_at": "2026-09-03T23:27:13Z",
+  "metrics": {
+    "brier": null,
+    "brier_baseline": null,
+    "brier_skill": null,
+    "log_loss": null,
+    "calibration": [],
+    "direction": {
+      "count": 0,
+      "accuracy": null,
+      "long_count": 0,
+      "short_count": 0,
+      "long_bias": null
+    },
+    "volatility_detection": {
+      "threshold": 80.0,
+      "true_positive": 0,
+      "false_positive": 0,
+      "false_negative": 0,
+      "true_negative": 0,
+      "precision": null,
+      "recall": null
+    },
+    "expected_move_coverage": {
+      "count": 0,
+      "coverage": null,
+      "mean_abs_realized": null,
+      "mean_predicted_range": null
+    },
+    "by_opportunity": [],
+    "by_volatility": [],
+    "by_setup_type": [],
+    "by_horizon": [],
+    "by_decision": []
+  }
+}
